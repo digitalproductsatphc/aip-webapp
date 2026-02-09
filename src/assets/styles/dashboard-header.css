@@ -1,0 +1,180 @@
+/* Dashboard Header Styles */
+.dashboard-header {
+    background: var(--p-surface-0);
+    border-radius: 16px 16px 0 0;
+    padding: 1.5rem;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--p-surface-border);
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--p-primary-400) 0%, var(--p-primary-600) 100%);
+}
+
+.dashboard-header:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-header__content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-header__avatar {
+    position: relative;
+}
+
+.dashboard-header__avatar .p-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--p-primary-100), var(--p-primary-200));
+    color: var(--p-primary-500);
+    border: none;
+}
+
+.dashboard-header__info {
+    color: var(--p-text-color);
+    flex: 1;
+    margin-left: 0.75rem;
+}
+
+.dashboard-header__greeting {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    color: var(--p-text-color);
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+.dashboard-header__date {
+    font-size: 0.875rem;
+    margin: 0;
+    color: var(--p-text-muted-color);
+    font-weight: 500;
+}
+
+.dashboard-header__toggle {
+    background: var(--p-surface-100) !important;
+    border: 1px solid var(--p-surface-border) !important;
+    color: var(--p-text-muted-color) !important;
+    border-radius: 12px !important;
+    width: 48px;
+    height: 48px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    font-size: 1.25rem;
+}
+
+.dashboard-header__toggle:hover {
+    background: var(--p-surface-200) !important;
+    border-color: var(--p-surface-300) !important;
+    transform: scale(1.05);
+}
+
+.dashboard-header__toggle:focus {
+    box-shadow: 0 0 0 2px var(--p-primary-200) !important;
+}
+
+/* Dark mode support */
+.app-dark .dashboard-header {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+}
+
+.app-dark .dashboard-header__avatar .p-avatar {
+    background: var(--p-surface-800);
+    color: var(--p-primary-400);
+}
+
+.app-dark .dashboard-header__toggle {
+    background: var(--p-surface-800) !important;
+    border-color: var(--p-surface-700) !important;
+    color: var(--p-text-color) !important;
+}
+
+.app-dark .dashboard-header__toggle:hover {
+    background: var(--p-surface-700) !important;
+    border-color: var(--p-surface-600) !important;
+}
+
+.app-dark .metrics-grid {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+}
+
+/* iPad styles */
+@media (max-width: 1024px) {
+    .dashboard-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .dashboard-header__greeting {
+        font-size: 1.375rem;
+    }
+    
+    .dashboard-header__date {
+        font-size: 0.875rem;
+    }
+    
+    .metrics-grid {
+        padding-top: 1.25rem;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 0.75rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .dashboard-header__content {
+        gap: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .dashboard-header__greeting {
+        font-size: 1.125rem;
+        margin-bottom: 0;
+    }
+    
+    .dashboard-header__date {
+        font-size: 0.75rem;
+    }
+    
+    .dashboard-header__toggle {
+        width: 32px;
+        height: 32px;
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+    
+    .metrics-grid {
+        padding-top: 0.75rem;
+        border-radius: 0 0 12px 12px;
+    }
+}

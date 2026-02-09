@@ -1,0 +1,20 @@
+:root[class*='app-dark'] {
+    /* Water Dark Theme */
+    --surface-ground: #0f172a;
+    --code-background: var(--p-surface-800);
+    --code-color: var(--p-surface-100);
+    
+    /* Water accent colors for dark mode */
+    --water-accent: #164e63;
+    --water-hover: #0e7490;
+    --water-border: #0891b2;
+    
+    /* Override colors for better dark mode contrast */
+    --p-primary-color: #00a9e0;
+    --text-color: #ffffff;
+    --text-color-secondary: #e2e8f0;
+    --text-muted-color: #cbd5e1;
+    --p-text-color: #ffffff;
+    --p-text-muted-color: #e2e8f0;
+    --p-text-secondary-color: #cbd5e1;
+}

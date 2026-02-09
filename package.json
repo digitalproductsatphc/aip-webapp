@@ -1,0 +1,35 @@
+{
+  "name": "ai-platform-webapp",
+  "version": "1.0.0",
+  "description": "AI Platform - Central authentication and system selection portal",
+  "scripts": {
+    "envbase": "vite --mode base",
+    "dev": "vite",
+    "build:dev": "vite build --mode development",
+    "build:staging": "vite build --mode staging",
+    "build:prod": "vite build --mode production",
+    "build:all": "concurrently \"npm run build:dev\" \"npm run build:staging\" \"npm run build:prod\"",
+    "preview": "vite preview",
+    "lint": "eslint --fix . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^4.15.0",
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/ios": "^8.0.1",
+    "@primevue/themes": "^4.2.4",
+    "concurrently": "^9.2.1",
+    "primeicons": "^6.0.1",
+    "primevue": "^4.2.4",
+    "vue": "^3.4.34",
+    "vue-router": "^4.4.0"
+  },
+  "devDependencies": {
+    "@primevue/auto-import-resolver": "^4.0.1",
+    "@vitejs/plugin-vue": "^5.0.5",
+    "sass": "^1.94.0",
+    "unplugin-vue-components": "^0.27.3",
+    "vite": "^5.3.1"
+  }
+}

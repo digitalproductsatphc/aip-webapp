@@ -1,0 +1,283 @@
+/* Global Metric Cards Styles */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.metrics-grid--three-col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.metric-card {
+    background: var(--p-surface-0);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--p-surface-border);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.metric-card--primary::before {
+    background: linear-gradient(90deg, var(--p-primary-400) 0%, var(--p-primary-600) 100%);
+}
+
+.metric-card--warning::before {
+    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+}
+
+.metric-card--danger::before {
+    background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%);
+}
+
+.metric-card--critical::before {
+    background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%);
+}
+
+.metric-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.metric-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.metric-card__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--p-surface-100);
+    color: var(--p-text-muted-color);
+    flex-shrink: 0;
+}
+
+.metric-card--primary .metric-card__icon {
+    background: linear-gradient(135deg, var(--p-primary-100), var(--p-primary-200));
+    color: var(--p-primary-500);
+}
+
+.metric-card--warning .metric-card__icon {
+    background: linear-gradient(135deg, #f093fb20, #f5576c20);
+    color: #f5576c;
+}
+
+.metric-card--danger .metric-card__icon {
+    background: linear-gradient(135deg, #ff9a9e20, #fecfef20);
+    color: #e91e63;
+}
+
+.metric-card--critical .metric-card__icon {
+    background: linear-gradient(135deg, #ff6b6b20, #ee5a2420);
+    color: #ff6b6b;
+}
+
+.metric-card__icon i {
+    font-size: 1.5rem;
+}
+
+.metric-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--p-text-muted-color);
+    line-height: 1.4;
+    flex: 1;
+}
+
+.metric-card__value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--p-text-color);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+}
+
+.metric-card__subtitle {
+    font-size: 0.875rem;
+    color: var(--p-text-muted-color);
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.metric-card__trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.metric-card__trend--positive {
+    color: #059669;
+    background: #dcfce7;
+}
+
+.metric-card__trend--negative {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.metric-card__trend--neutral {
+    color: var(--p-text-muted-color);
+    background: var(--p-surface-100);
+}
+
+.metric-card__progress {
+    margin-top: 0.75rem;
+}
+
+.metric-card__progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.metric-card__progress-label {
+    font-size: 0.875rem;
+    color: var(--p-text-muted-color);
+    font-weight: 500;
+}
+
+.metric-card__progress-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--p-text-color);
+}
+
+.metric-card__progress-bar {
+    height: 8px;
+    background: var(--p-surface-200);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.metric-card__progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* iPad styles */
+@media (max-width: 1200px) {
+    .metrics-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+    
+    .metrics-grid--three-col {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .metric-card__value {
+        font-size: 2.25rem;
+    }
+    
+    .metric-card__icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .metric-card__icon i {
+        font-size: 1.375rem;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        padding: 0;
+    }
+    
+    .metrics-grid--three-col {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .metric-card {
+        min-width: 0;
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+    }
+    
+    .metric-card__header {
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-card__icon {
+        width: 24px;
+        height: 24px;
+        margin: 0 auto;
+    }
+    
+    .metric-card__icon i {
+        font-size: 0.75rem;
+    }
+    
+    .metric-card__title {
+        font-size: 0.65rem;
+        line-height: 1.2;
+    }
+    
+    .metric-card__value {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+    }
+    
+    .metric-card__subtitle {
+        display: none;
+    }
+    
+    .metric-card__trend {
+        display: none;
+    }
+    
+    .metric-card__progress {
+        display: none;
+    }
+}
+
+/* Dark mode */
+.app-dark .metric-card {
+    background: var(--p-surface-900);
+    border-color: var(--p-surface-700);
+}
+
+.app-dark .metric-card__icon {
+    background: var(--p-surface-800);
+}
+
+.app-dark .metric-card__progress-bar {
+    background: var(--p-surface-700);
+}
+
+.app-dark .metric-card__trend--neutral {
+    background: var(--p-surface-800);
+}
+
