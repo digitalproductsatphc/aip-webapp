@@ -15,12 +15,6 @@ const router = createRouter({
       meta: { requiresAuth: false }
     },
     {
-      path: '/login2',
-      name: 'login2',
-      component: () => import('@/auth/views/Login2.vue'),
-      meta: { requiresAuth: false }
-    },
-    {
       path: '/systems',
       name: 'systems',
       component: () => import('@/views/SystemSelection.vue'),

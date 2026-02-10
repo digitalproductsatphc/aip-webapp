@@ -18,7 +18,7 @@ const router = useRouter()
 
 onMounted(() => {
   setTimeout(() => {
-    router.replace('/login2')
+    router.replace('/login')
   }, 3000)
 })
 </script>
