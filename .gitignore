@@ -1,0 +1,30 @@
+# Node
+node_modules/
+dist/
+build/
+
+# Env
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Capacitor
+capacitor.config.json.bak
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+*.jks
+
+# iOS
+ios/App/Pods/
+ios/App/build/
+ios/App/*.xcworkspace
+ios/App/Podfile.lock
+DerivedData/
