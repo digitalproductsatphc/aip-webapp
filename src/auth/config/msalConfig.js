@@ -4,14 +4,14 @@ import { Capacitor } from '@capacitor/core';
 // Determine redirect URI based on platform
 const getRedirectUri = () => {
   if (Capacitor.isNativePlatform()) {
-    return 'msauth.com.aiplatform.app://auth';
+    return import.meta.env.VITE_MSAL_MOBILE_REDIRECT_URI;
   }
   return import.meta.env.VITE_MSAL_REDIRECT_URI;
 };
 
 const getPostLogoutRedirectUri = () => {
   if (Capacitor.isNativePlatform()) {
-    return 'msauth.com.aiplatform.app://auth';
+    return import.meta.env.VITE_MSAL_MOBILE_REDIRECT_URI;
   }
   return import.meta.env.VITE_MSAL_POST_LOGOUT_REDIRECT_URI;
 };
