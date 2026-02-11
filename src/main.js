@@ -18,7 +18,6 @@ import ProgressSpinner from 'primevue/progressspinner';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
 import Menu from 'primevue/menu';
 import Toast from 'primevue/toast';

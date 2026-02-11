@@ -1,12 +1,28 @@
 import { LogLevel } from '@azure/msal-browser';
+import { Capacitor } from '@capacitor/core';
+
+// Determine redirect URI based on platform
+const getRedirectUri = () => {
+  if (Capacitor.isNativePlatform()) {
+    return 'msauth://com.aiplatform.app/callback';
+  }
+  return import.meta.env.VITE_MSAL_REDIRECT_URI;
+};
+
+const getPostLogoutRedirectUri = () => {
+  if (Capacitor.isNativePlatform()) {
+    return 'msauth://com.aiplatform.app/callback';
+  }
+  return import.meta.env.VITE_MSAL_POST_LOGOUT_REDIRECT_URI;
+};
 
 // MSAL configuration
 export const msalConfig = {
   auth: {
     clientId: import.meta.env.VITE_MSAL_CLIENT_ID,
     authority: import.meta.env.VITE_MSAL_AUTHORITY,
-    redirectUri: import.meta.env.VITE_MSAL_REDIRECT_URI,
-    postLogoutRedirectUri: import.meta.env.VITE_MSAL_POST_LOGOUT_REDIRECT_URI,
+    redirectUri: getRedirectUri(),
+    postLogoutRedirectUri: getPostLogoutRedirectUri(),
     navigateToLoginRequestUrl: true,
   },
   cache: {

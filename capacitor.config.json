@@ -4,5 +4,16 @@
   "webDir": "dist/dev",
   "server": {
     "url": "https://save-respectively-booking-don.trycloudflare.com"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "ios": {
+    "contentInset": "automatic"
   }
 }
