@@ -23,7 +23,7 @@ export const msalConfig = {
     authority: import.meta.env.VITE_MSAL_AUTHORITY,
     redirectUri: getRedirectUri(),
     postLogoutRedirectUri: getPostLogoutRedirectUri(),
-    navigateToLoginRequestUrl: true,
+    navigateToLoginRequestUrl: false,
   },
   cache: {
     cacheLocation: 'localStorage',

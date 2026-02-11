@@ -8,6 +8,8 @@
 
 <script>
 import { ref, onMounted, provide } from 'vue';
+import { Capacitor } from '@capacitor/core';
+import { App } from '@capacitor/app';
 import { loginRequest } from '../config/msalConfig';
 import msalInstance, { initializeMsal } from '../services/msalInstance';
 
@@ -18,7 +20,6 @@ export default {
     const isAuthenticated = ref(false);
     const userAccount = ref(null);
     
-    // Provide the MSAL instance and auth state to child components
     provide('msalInstance', msalInstance);
     provide('isAuthenticated', isAuthenticated);
     provide('userAccount', userAccount);
@@ -46,21 +47,28 @@ export default {
       msalInstance.logoutRedirect(logoutRequest);
     };
     
-    // Provide login and logout methods
     provide('login', login);
     provide('logout', logout);
     
     onMounted(async () => {
       try {
-        // Initialize MSAL instance
         await initializeMsal();
         
-        // Handle redirect promise
+        // Handle deep link for mobile
+        if (Capacitor.isNativePlatform()) {
+          App.addListener('appUrlOpen', async (data) => {
+            console.log('App opened with URL:', data.url);
+            if (data.url.includes('msauth.com.aiplatform.app://auth')) {
+              const response = await msalInstance.handleRedirectPromise();
+              handleResponse(response);
+            }
+          });
+        }
+        
         const response = await msalInstance.handleRedirectPromise();
         if (response) {
           handleResponse(response);
         } else {
-          // Check if user is already signed in
           const accounts = msalInstance.getAllAccounts();
           if (accounts.length > 0) {
             msalInstance.setActiveAccount(accounts[0]);

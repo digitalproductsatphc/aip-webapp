@@ -3,7 +3,7 @@
   "appName": "AI Platform",
   "webDir": "dist/dev",
   "server": {
-    "url": "https://save-respectively-booking-don.trycloudflare.com"
+    "url": "http://localhost:5173"
   },
   "plugins": {
     "CapacitorHttp": {
