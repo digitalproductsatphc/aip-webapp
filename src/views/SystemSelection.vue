@@ -280,7 +280,7 @@ export default {
   border: 1px solid #e2e8f0;
   outline: none;
   background: #ffffff;
-  font-size: 1rem;
+  font-size: 16px;
   color: #0f172a;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;

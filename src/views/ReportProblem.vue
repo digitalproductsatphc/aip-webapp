@@ -284,7 +284,7 @@ export default {
   padding: 12px 16px;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
-  font-size: 1rem;
+  font-size: 16px;
   color: #0f172a;
   background: #ffffff;
   transition: border-color 0.2s ease;
