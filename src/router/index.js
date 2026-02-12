@@ -3,6 +3,9 @@ import { authGuard } from '@/auth/guards/authGuard';
 
 const router = createRouter({
   history: createWebHistory(),
+  scrollBehavior() {
+    return { top: 0 };
+  },
   routes: [
     {
       path: '/',
