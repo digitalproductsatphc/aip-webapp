@@ -8,12 +8,19 @@
       <div class="hero-content">
         <div class="profile-section">
           <h1 class="profile-header">Profile</h1>
-          <Avatar
-            :image="userPhotoUrl"
-            size="xlarge"
-            shape="circle"
-            class="user-avatar"
-          />
+          <div
+            v-if="userPhotoUrl && !userPhotoUrl.startsWith('pi ')"
+            class="user-avatar-wrapper"
+          >
+            <img :src="userPhotoUrl" class="user-avatar-img" />
+          </div>
+          <div
+            v-else
+            class="icon-circle user-avatar-icon"
+            style="background: linear-gradient(135deg, #ffffff, #ffffff80)"
+          >
+            <i class="pi pi-user" style="color: #005a9e"></i>
+          </div>
           <h2 class="username-text">{{ userInfo?.name || 'User' }}</h2>
           <p class="user-email">{{ userInfo?.username || 'No email available' }}</p>
         </div>
@@ -75,12 +82,10 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMsal } from '@/auth/composables/useMsal'
 
-import Avatar from 'primevue/avatar'
 import BottomNav from '@/components/BottomNav.vue'
 
 export default {
   components: {
-    Avatar,
     BottomNav
   },
 
@@ -209,6 +214,31 @@ export default {
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 24px;
+}
+
+.user-avatar-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-avatar-icon {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
 }
 
 .user-avatar {

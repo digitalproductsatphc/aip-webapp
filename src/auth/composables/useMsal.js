@@ -78,9 +78,18 @@ export function useMsal() {
   };
 
   const fetchUserPhoto = async () => {
-    if (!userPhotoUrl.value) {
+    if (userPhotoUrl.value) return;
+    
+    if (Capacitor.isNativePlatform()) {
+      userPhotoUrl.value = 'pi pi-user';
+      return;
+    }
+    
+    try {
       const photoUrl = await graphService.getUserPhoto();
       userPhotoUrl.value = photoUrl;
+    } catch (error) {
+      console.log('[useMsal] Photo fetch failed:', error.code || error.message);
     }
   };
 
