@@ -1,80 +1,89 @@
 import { inject, computed, ref } from 'vue';
+import { Capacitor } from '@capacitor/core';
+import { MsalPlugin } from '@tashelix/capacitor-msal-auth';
 import { graphService } from '../services/graphService';
 
-/**
- * Composable for using MSAL authentication in components
- */
 export function useMsal() {
+
   const msalInstance = inject('msalInstance');
   const isAuthenticated = inject('isAuthenticated', ref(false));
   const userAccount = inject('userAccount', ref(null));
-  const login = inject('login', () => {
-    console.error('Login function not available');
-  });
-  const logout = inject('logout', () => {
-    console.error('Logout function not available');
-  });
-  
+  const login = inject('login');
+  const logout = inject('logout');
+
   const userPhotoUrl = ref(null);
 
-  // Get user info from the account
-  const userInfo = computed(() => {
+  // Decode JWT helper
+  const decodeJwt = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch {
+      return null;
+    }
+  };
 
+  const userInfo = computed(() => {
     if (!userAccount?.value) return null;
-    console.log(userAccount.value.idTokenClaims)
+
+    if (Capacitor.isNativePlatform()) {
+      const idToken = userAccount.value.idToken;
+      const claims = idToken ? decodeJwt(idToken) : null;
+
+      return {
+        name: claims?.name || userAccount.value.username,
+        username: claims?.preferred_username || userAccount.value.username,
+        roles: claims?.roles || [],
+        photoUrl: userPhotoUrl.value
+      };
+    }
+
     return {
-      name: userAccount.value.name || userAccount.value.username,
+      name: userAccount.value.name,
       username: userAccount.value.username,
       roles: userAccount.value.idTokenClaims?.roles || [],
       photoUrl: userPhotoUrl.value
     };
   });
 
-  // Fetch user profile photo
-  const fetchUserPhoto = async () => {
-    if (userAccount?.value && !userPhotoUrl.value) {
-      const photoUrl = await graphService.getUserPhoto();
-      userPhotoUrl.value = photoUrl;
-    }
-  };
-  
-  // Check if user has a specific role
   const hasRole = (role) => {
-    if (!userAccount?.value || !userAccount.value.idTokenClaims?.roles) {
-      return false;
-    }
-    
-    return userAccount.value.idTokenClaims.roles.includes(role);
+    return userInfo.value?.roles?.includes(role);
   };
-  
-  // Get access token for API calls
+
   const getAccessToken = async () => {
-    if (!msalInstance || !userAccount?.value) {
-      throw new Error('MSAL not initialized or user not logged in');
+
+    if (!userAccount?.value) {
+      throw new Error('User not logged in');
     }
-    
+
+    if (Capacitor.isNativePlatform()) {
+
+      const accounts = await MsalPlugin.getAccounts();
+      const username = accounts.accounts[0].username;
+
+      const tokenResult = await MsalPlugin.acquireToken({
+        scopes: ['User.Read'],
+        identifier: username
+      });
+
+      return tokenResult.accessToken;
+    }
+
     const request = {
       scopes: ['User.Read'],
       account: userAccount.value
     };
-    
-    try {
-      // Ensure MSAL is initialized
-      if (typeof msalInstance.acquireTokenSilent !== 'function') {
-        throw new Error('MSAL instance not properly initialized');
-      }
-      
-      const response = await msalInstance.acquireTokenSilent(request);
-      return response.accessToken;
-    } catch (error) {
-      // If silent token acquisition fails, fallback to interactive method
-      if (error.name === 'InteractionRequiredAuthError') {
-        return msalInstance.acquireTokenRedirect(request);
-      }
-      throw error;
+
+    const response = await msalInstance.acquireTokenSilent(request);
+    return response.accessToken;
+  };
+
+  const fetchUserPhoto = async () => {
+    if (!userPhotoUrl.value) {
+      const photoUrl = await graphService.getUserPhoto();
+      userPhotoUrl.value = photoUrl;
     }
   };
-  
+
   return {
     isAuthenticated,
     userAccount,

@@ -13,22 +13,28 @@ const isLoading = ref(false);
 
 const handleLogin = async () => {
   isLoading.value = true;
+
   try {
     if (Capacitor.isNativePlatform()) {
-      const result = await MsalPlugin.login({ scopes: loginRequest.scopes });
-      console.log('[Login] Login result:' + result );
-      if (result?.accessToken) {
+      const result = await MsalPlugin.login({
+        scopes: loginRequest.scopes
+      });
+
+      console.log('[Login] Native login result:', JSON.stringify(result, null, 2));
+
+      if (result) {
         userAccount.value = result.account || result;
         isAuthenticated.value = true;
-        router.push('/systems');
-        console.log('[Login] Login redirect: /systems', );
+        router.replace('/systems');
       }
+
     } else {
       const msalInstance = await initializeMsal();
       await msalInstance.loginRedirect(loginRequest);
     }
+
   } catch (error) {
-    console.error('[Login] Login error:', error);
+    console.error('[Login] Login error:', JSON.stringify(error, null, 2));
     alert('Login failed: ' + (error?.errorMessage || error?.message || 'Unknown error'));
   } finally {
     isLoading.value = false;
@@ -36,29 +42,28 @@ const handleLogin = async () => {
 };
 
 onMounted(async () => {
-  if (isAuthenticated.value) {
-    router.push('/systems');
-    return;
-  }
-
   if (Capacitor.isNativePlatform()) {
     try {
       const result = await MsalPlugin.getAccounts();
+
       if (result?.accounts?.length) {
         userAccount.value = result.accounts[0];
         isAuthenticated.value = true;
-        router.push('/systems');
+        router.replace('/systems');
       }
+
     } catch (error) {
-      console.log('[Login] No cached account:', error);
+      console.log('[Login] No cached account');
     }
+
   } else {
     const msalInstance = await initializeMsal();
     const response = await msalInstance.handleRedirectPromise();
+
     if (response) {
       userAccount.value = response.account;
       isAuthenticated.value = true;
-      router.push('/systems');
+      router.replace('/systems');
     }
   }
 });
