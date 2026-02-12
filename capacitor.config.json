@@ -8,6 +8,12 @@
   "plugins": {
     "CapacitorHttp": {
       "enabled": true
+    },
+    "MsalAuth": {
+      "clientId": "cf29079b-3a9c-4188-8f22-2a0fbd05b85a",
+      "tenant": "31f660a5-192a-4db3-92ba-ca424f1b259e",
+      "scopes": ["User.Read"],
+      "keyHash": ""
     }
   },
   "android": {

@@ -1,96 +1,100 @@
 import { loginRequest } from '../config/msalConfig';
-import msalInstance, { initializeMsal } from '../services/msalInstance';
+import { Capacitor } from '@capacitor/core';
+import { MsalPlugin } from '@tashelix/capacitor-msal-auth';
+import { initializeMsal } from '../services/msalInstance';
 
-// API scopes for accessing backend
 const apiScopes = {
     api: ['User.Read']
 };
 
 export const authService = {
-    /**
-     * Initialize the auth service
-     */
     async initialize() {
-        // Initialize MSAL
-        await initializeMsal();
+        const msalInstance = await initializeMsal();
         
-        // Handle redirect promise
-        await msalInstance.handleRedirectPromise();
-        
-        // Check if user is signed in
-        const accounts = msalInstance.getAllAccounts();
-        if (accounts.length > 0) {
-            msalInstance.setActiveAccount(accounts[0]);
-            return true;
+        if (Capacitor.isNativePlatform()) {
+            try {
+                const result = await MsalPlugin.getAccounts();
+                return !!result?.accounts;
+            } catch {
+                console.log('Error in authService');
+                return false;
+            }
+        } else {
+            await msalInstance.handleRedirectPromise();
+            const accounts = msalInstance.getAllAccounts();
+            if (accounts.length > 0) {
+                msalInstance.setActiveAccount(accounts[0]);
+                return true;
+            }
+            return false;
         }
-        return false;
     },
 
-    /**
-     * Login with redirect
-     */
-    login() {
-        msalInstance.loginRedirect(loginRequest);
+    async login() {
+        if (Capacitor.isNativePlatform()) {
+            return await MsalPlugin.login({ scopes: loginRequest.scopes });
+        } else {
+            const msalInstance = await initializeMsal();
+            return msalInstance.loginRedirect(loginRequest);
+        }
     },
 
-    /**
-     * Logout the user
-     */
-    logout() {
-        msalInstance.logoutRedirect();
+    async logout() {
+        if (Capacitor.isNativePlatform()) {
+            return await MsalPlugin.logout();
+        } else {
+            const msalInstance = await initializeMsal();
+            return msalInstance.logoutRedirect();
+        }
     },
 
-    /**
-     * Get the current authenticated user
-     */
-    getUser() {
-        const account = msalInstance.getActiveAccount();
-        return account || null;
+    async getUser() {
+        if (Capacitor.isNativePlatform()) {
+            const result = await MsalPlugin.getAccount();
+            return result?.account || null;
+        } else {
+            const msalInstance = await initializeMsal();
+            return msalInstance.getActiveAccount() || null;
+        }
     },
 
-    /**
-     * Get user roles from ID token claims
-     */
     getUserRoles() {
-        const account = msalInstance.getActiveAccount();
+        const account = this.getUser();
         if (!account) return [];
-        
-        // Azure AD roles are typically in the 'roles' claim
         const idTokenClaims = account.idTokenClaims;
         return idTokenClaims?.roles || [];
     },
 
-    /**
-     * Check if user has a specific role
-     */
     hasRole(role) {
         const roles = this.getUserRoles();
         return roles.includes(role);
     },
 
-    /**
-     * Get access token for API calls
-     */
     async getAccessToken() {
-        const account = msalInstance.getActiveAccount();
-        if (!account) {
-            throw new Error('User not authenticated');
-        }
-
-        const silentRequest = {
-            scopes: apiScopes.api,
-            account: account
-        };
-
-        try {
-            const response = await msalInstance.acquireTokenSilent(silentRequest);
-            return response.accessToken;
-        } catch (error) {
-            // If silent token acquisition fails, fallback to interactive method
-            if (error.name === 'InteractionRequiredAuthError') {
-                return msalInstance.acquireTokenRedirect(silentRequest);
+        if (Capacitor.isNativePlatform()) {
+            const result = await MsalPlugin.acquireToken({ scopes: apiScopes.api });
+            return result.accessToken;
+        } else {
+            const msalInstance = await initializeMsal();
+            const account = msalInstance.getActiveAccount();
+            if (!account) {
+                throw new Error('User not authenticated');
             }
-            throw error;
+
+            const silentRequest = {
+                scopes: apiScopes.api,
+                account: account
+            };
+
+            try {
+                const response = await msalInstance.acquireTokenSilent(silentRequest);
+                return response.accessToken;
+            } catch (error) {
+                if (error.name === 'InteractionRequiredAuthError') {
+                    return msalInstance.acquireTokenRedirect(silentRequest);
+                }
+                throw error;
+            }
         }
     }
 };

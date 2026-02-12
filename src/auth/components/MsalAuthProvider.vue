@@ -9,77 +9,101 @@
 <script>
 import { ref, onMounted, provide } from 'vue';
 import { Capacitor } from '@capacitor/core';
-import { App } from '@capacitor/app';
+import { MsalPlugin } from '@tashelix/capacitor-msal-auth';
 import { loginRequest } from '../config/msalConfig';
-import msalInstance, { initializeMsal } from '../services/msalInstance';
+import { initializeMsal } from '../services/msalInstance';
 
 export default {
   name: 'MsalAuthProvider',
   setup() {
-    const loading = ref(true);
+    const loading = ref(false);
     const isAuthenticated = ref(false);
     const userAccount = ref(null);
+    let msalInstance = null;
     
-    provide('msalInstance', msalInstance);
+    console.log('[MsalAuthProvider] Setup called');
+    
     provide('isAuthenticated', isAuthenticated);
     provide('userAccount', userAccount);
     
     const handleResponse = (response) => {
+      console.log('[MsalAuthProvider] handleResponse:', response);
       if (response !== null) {
-        userAccount.value = response.account;
+        userAccount.value = response.account || response;
         isAuthenticated.value = true;
       }
-      loading.value = false;
+      console.log('[MsalAuthProvider] Response handled');
     };
     
     const login = async () => {
+      console.log('[MsalAuthProvider] login triggered');
       try {
-        await msalInstance.loginRedirect(loginRequest);
+        if (Capacitor.isNativePlatform()) {
+          console.log('[MsalAuthProvider] Native login...');
+          const result = await MsalPlugin.login({ scopes: loginRequest.scopes });
+          console.log('[MsalAuthProvider] Native login result:', result);
+          if (result && result.accessToken) {
+            userAccount.value = result.account || result;
+            isAuthenticated.value = true;
+          }
+        } else {
+          console.log('[MsalAuthProvider] Web login redirect...');
+          await msalInstance.loginRedirect(loginRequest);
+        }
       } catch (error) {
-        console.error('Error during login:', error);
+        console.error('[MsalAuthProvider] Login error:', error);
       }
     };
     
-    const logout = () => {
-      const logoutRequest = {
-        account: msalInstance.getActiveAccount(),
-      };
-      msalInstance.logoutRedirect(logoutRequest);
+    const logout = async () => {
+      try {
+        if (Capacitor.isNativePlatform()) {
+          await MsalPlugin.logout();
+        } else {
+          const logoutRequest = {
+            account: msalInstance.getActiveAccount(),
+          };
+          msalInstance.logoutRedirect(logoutRequest);
+        }
+      } catch (error) {
+        console.error('Error during logout:', error);
+      }
     };
     
     provide('login', login);
     provide('logout', logout);
     
     onMounted(async () => {
+      console.log('[MsalAuthProvider] onMounted triggered');
       try {
-        await initializeMsal();
+        console.log('[MsalAuthProvider] Getting MSAL instance...');
+        msalInstance = await initializeMsal();
+        console.log('[MsalAuthProvider] MSAL instance retrieved:', !!msalInstance);
         
-        // Handle deep link for mobile
         if (Capacitor.isNativePlatform()) {
-          App.addListener('appUrlOpen', async (data) => {
-            console.log('App opened with URL:', data.url);
-            if (data.url.includes('msauth.com.aiplatform.app://auth')) {
-              const response = await msalInstance.handleRedirectPromise();
-              handleResponse(response);
+          console.log('[MsalAuthProvider] Native platform detected');
+          try {
+            const result = await MsalPlugin.getAccounts();
+            console.log('[MsalAuthProvider] getAccounts result:', result);
+            if (result?.accounts && result.accounts.length > 0) {
+              userAccount.value = result.accounts[0];
+              isAuthenticated.value = true;
             }
-          });
-        }
-        
-        const response = await msalInstance.handleRedirectPromise();
-        if (response) {
-          handleResponse(response);
+          } catch (error) {
+            console.log('[MsalAuthProvider] No active account:', error);
+          }
         } else {
+          console.log('[MsalAuthProvider] Web platform detected');
           const accounts = msalInstance.getAllAccounts();
           if (accounts.length > 0) {
             msalInstance.setActiveAccount(accounts[0]);
             userAccount.value = accounts[0];
             isAuthenticated.value = true;
           }
-          loading.value = false;
         }
+        console.log('[MsalAuthProvider] onMounted completed, isAuthenticated:', isAuthenticated.value);
       } catch (error) {
-        console.error('Error initializing MSAL:', error);
-        loading.value = false;
+        console.error('[MsalAuthProvider] Error:', error, error.stack);
       }
     });
     

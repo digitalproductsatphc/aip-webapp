@@ -1,28 +1,68 @@
 <script setup>
 import { inject, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { Capacitor } from '@capacitor/core';
+import { MsalPlugin } from '@tashelix/capacitor-msal-auth';
+import { loginRequest } from '../config/msalConfig';
+import { initializeMsal } from '../services/msalInstance';
 
-const login = inject('login');
 const isAuthenticated = inject('isAuthenticated');
+const userAccount = inject('userAccount');
 const router = useRouter();
 const isLoading = ref(false);
 
 const handleLogin = async () => {
   isLoading.value = true;
   try {
-    await login();
+    if (Capacitor.isNativePlatform()) {
+      const result = await MsalPlugin.login({ scopes: loginRequest.scopes });
+      console.log('[Login] Login result:' + result );
+      if (result?.accessToken) {
+        userAccount.value = result.account || result;
+        isAuthenticated.value = true;
+        router.push('/systems');
+        console.log('[Login] Login redirect: /systems', );
+      }
+    } else {
+      const msalInstance = await initializeMsal();
+      await msalInstance.loginRedirect(loginRequest);
+    }
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('[Login] Login error:', error);
+    alert('Login failed: ' + (error?.errorMessage || error?.message || 'Unknown error'));
   } finally {
     isLoading.value = false;
   }
 };
 
-onMounted(() => {
-  if (isAuthenticated?.value) {
+onMounted(async () => {
+  if (isAuthenticated.value) {
     router.push('/systems');
+    return;
+  }
+
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const result = await MsalPlugin.getAccounts();
+      if (result?.accounts?.length) {
+        userAccount.value = result.accounts[0];
+        isAuthenticated.value = true;
+        router.push('/systems');
+      }
+    } catch (error) {
+      console.log('[Login] No cached account:', error);
+    }
+  } else {
+    const msalInstance = await initializeMsal();
+    const response = await msalInstance.handleRedirectPromise();
+    if (response) {
+      userAccount.value = response.account;
+      isAuthenticated.value = true;
+      router.push('/systems');
+    }
   }
 });
+
 </script>
 
 <template>

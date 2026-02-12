@@ -165,17 +165,17 @@ app.use(ToastService);
 app.use(ConfirmationService);
 
 // Initialize MSAL before mounting the app
+console.log('[Main] Starting app initialization...');
 initializeAuth().then(() => {
-    // Apply Water theme after initialization
+    console.log('[Main] Auth initialized, mounting app...');
     updatePreset(waterTheme);
-    // Mount the app after MSAL initialization
     app.mount('#app');
+    console.log('[Main] App mounted successfully');
 }).catch(error => {
-    console.error('Failed to initialize the app:', error);
-    // Apply Water theme even on error
+    console.error('[Main] Failed to initialize the app:', error);
     updatePreset(waterTheme);
-    // Mount the app anyway to show error messages
     app.mount('#app');
+    console.log('[Main] App mounted despite error');
 });
 
 // Global error handler
