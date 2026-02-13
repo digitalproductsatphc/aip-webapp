@@ -1,11 +1,12 @@
 import { inject, computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { Capacitor } from '@capacitor/core';
 import { MsalPlugin } from '@tashelix/capacitor-msal-auth';
 import { graphService } from '../services/graphService';
 
 export function useMsal() {
-
-  const msalInstance = inject('msalInstance');
+  const router = useRouter();
+  const msalInstance = Capacitor.isNativePlatform() ? null : inject('msalInstance', null);
   const isAuthenticated = inject('isAuthenticated', ref(false));
   const userAccount = inject('userAccount', ref(null));
   const login = inject('login');
@@ -49,23 +50,40 @@ export function useMsal() {
     return userInfo.value?.roles?.includes(role);
   };
 
-  const getAccessToken = async () => {
+  // Monitor token expiration
+  const checkTokenExpiration = () => {
+    if (!userAccount?.value?.idTokenClaims?.exp) return;
+    
+    const expiresAt = userAccount.value.idTokenClaims.exp * 1000;
+    const timeUntilExpiry = expiresAt - Date.now();
+    
+    if (timeUntilExpiry > 0) {
+      setTimeout(() => router.push('/login'), timeUntilExpiry);
+    } else {
+      router.push('/login');
+    }
+  };
 
+  if (!Capacitor.isNativePlatform()) {
+    checkTokenExpiration();
+  }
+
+  const getAccessToken = async () => {
     if (!userAccount?.value) {
+      router.push('/login');
       throw new Error('User not logged in');
     }
 
     if (Capacitor.isNativePlatform()) {
 
-      const accounts = await MsalPlugin.getAccounts();
-      const username = accounts.accounts[0].username;
+      const { accounts } = await MsalPlugin.getAccounts();
+      const username = accounts[0].username;
+      const result = await MsalPlugin.login({ identifier: username });
 
-      const tokenResult = await MsalPlugin.acquireToken({
-        scopes: ['User.Read'],
-        identifier: username
-      });
-
-      return tokenResult.accessToken;
+      return {
+        accessToken: result.accessToken,
+        idToken: result.idToken
+      };
     }
 
     const request = {
@@ -73,8 +91,16 @@ export function useMsal() {
       account: userAccount.value
     };
 
-    const response = await msalInstance.acquireTokenSilent(request);
-    return response.accessToken;
+    try {
+      const response = await msalInstance.acquireTokenSilent(request);
+      return {
+        accessToken: response.accessToken,
+        idToken: response.idToken
+      };
+    } catch (error) {
+      router.push('/login');
+      throw error;
+    }
   };
 
   const fetchUserPhoto = async () => {

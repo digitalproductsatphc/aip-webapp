@@ -74,7 +74,7 @@ export default {
 
   setup() {
     const router = useRouter()
-    const { userInfo, fetchUserPhoto } = useMsal()
+    const { userInfo, fetchUserPhoto, getAccessToken } = useMsal()
 
     const availableSystems = ref([])
     const searchQuery = ref('')
@@ -136,14 +136,22 @@ export default {
       }
     }
 
-    const navigateToSystem = (system) => {
+    const navigateToSystem = async (system) => {
       const urls = {
         acsp: import.meta.env.VITE_ACSP_URL,
         ihn: import.meta.env.VITE_IHN_URL
       }
 
       const url = urls[system.id]
-      if (url) window.open(url, '_blank')
+      if (url) {
+        try {
+          const { accessToken, idToken } = await getAccessToken()
+          window.open(`${url}?token=${accessToken}&idToken=${idToken}`, '_blank')
+        } catch (error) {
+          console.error('Error getting access token:', error)
+          window.open(url, '_blank')
+        }
+      }
     }
 
     onMounted(() => {
